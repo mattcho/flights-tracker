@@ -11,20 +11,52 @@ app.use(express.bodyParser());    // Middleware for reading request body
 // This is an example of hooking up a request handler with a specific request
 // path and HTTP verb using the Express routing API.
 app.get('/', function(req, res){
-    res.render('index')
+    var flights;
+    var Flight = Parse.Object.extend("Flight");
+    var query = new Parse.Query(Flight);
+    query.find().then(function(_flights){
+        flights = _flights
+        res.render('index', {flights: flights})
+    }, function(_error){
+        res.json(_error)
+    })
 })
 
-// // Example reading from the request query string of an HTTP get request.
-// app.get('/test', function(req, res) {
-//   // GET http://example.parseapp.com/test?message=hello
-//   res.send(req.query.message);
-// });
+app.get('/api/flights', function(req, res){
+    var flights;
+    var Flight = Parse.Object.extend("Flight");
+    var query = new Parse.Query(Flight);
+    query.find().then(function(_flights){
+        flights = _flights
+        res.json(flights)
+    }, function(_error){
+        res.json(_error)
+    })
+})
 
-// // Example reading from the request body of an HTTP post request.
-// app.post('/test', function(req, res) {
-//   // POST http://example.parseapp.com/test (with request body "message=hello")
-//   res.send(req.body.message);
-// });
+app.post('/api/flights/create', function(req, res){
+    var Flight = Parse.Object.extend("Flight");
+    var flightNum = req.body.flightNum;
+    var datetime = new Date(req.body.datetime)
+    var flight = new Flight({
+        flightNum: flightNum,
+        datetime: datetime
+    })
+    flight.save().then(function(_flight){
+        res.redirect('/');
+    }, function(_error){
+        res.json(_error);
+    })
 
-// Attach the Express app to Cloud Code.
+
+})
+
+app.post('/api/flights/:id', function(req, res){
+    var Flight = Parse.Object.extend("Flight");
+    var flight = new Flight({id: req.params.id})
+    flight.destroy().then(function(){
+        res.redirect('/')
+    })
+})
+
 app.listen();
