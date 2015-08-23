@@ -14,6 +14,7 @@ app.get('/', function(req, res){
     var flights;
     var Flight = Parse.Object.extend("Flight");
     var query = new Parse.Query(Flight);
+    query.descending('datetime');
     query.find().then(function(_flights){
         flights = _flights
         res.render('index', {flights: flights})
@@ -22,17 +23,17 @@ app.get('/', function(req, res){
     })
 })
 
-app.get('/api/flights', function(req, res){
-    var flights;
-    var Flight = Parse.Object.extend("Flight");
-    var query = new Parse.Query(Flight);
-    query.find().then(function(_flights){
-        flights = _flights
-        res.json(flights)
-    }, function(_error){
-        res.json(_error)
-    })
-})
+//app.get('/api/flights', function(req, res){
+//    var flights;
+//    var Flight = Parse.Object.extend("Flight");
+//    var query = new Parse.Query(Flight);
+//    query.find().then(function(_flights){
+//        flights = _flights
+//        res.json(flights)
+//    }, function(_error){
+//        res.json(_error)
+//    })
+//})
 
 app.post('/api/flights/create', function(req, res){
     var Flight = Parse.Object.extend("Flight");
